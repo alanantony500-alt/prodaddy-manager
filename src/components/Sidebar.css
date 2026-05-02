@@ -1,6 +1,5 @@
 .sidebar {
-  width: 280px;
-  min-width: 280px;
+  width: clamp(250px, 20vw, 300px);
   height: 100vh;
   border-radius: 0;
   border-left: none;
@@ -86,11 +85,13 @@
   font-size: 0.875rem;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .sidebar {
     position: fixed;
     top: 0;
-    left: -280px;
+    left: -100%;
+    width: 80vw;
+    max-width: 320px;
     z-index: 1000;
     transition: left 0.3s ease;
     border-right: 1px solid var(--glass-border);

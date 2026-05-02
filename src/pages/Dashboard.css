@@ -1,5 +1,5 @@
 .dashboard {
-  max-width: 1200px;
+  max-width: var(--max-width);
   margin: 0 auto;
 }
 
@@ -40,9 +40,9 @@
 }
 
 .summary-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.75rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -125,6 +125,7 @@
 
 .records-table-container {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .records-table {
@@ -239,15 +240,17 @@
   background: var(--glass-bg);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .mobile-menu-btn {
     display: block;
   }
-  
+}
+
+@media (max-width: 768px) {
   .dashboard-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 1rem;
+    gap: var(--space-md);
   }
   
   .header-actions {
@@ -272,5 +275,10 @@
 @media (max-width: 480px) {
   .summary-cards {
     grid-template-columns: 1fr;
+  }
+  
+  .header-actions {
+    flex-direction: column;
+    align-items: stretch;
   }
 }
