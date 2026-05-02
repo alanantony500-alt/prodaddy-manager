@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { Plus, Search, Download, Filter, DollarSign, TrendingUp, Calendar, Activity } from 'lucide-react';
+import { Plus, Search, Download, Filter, DollarSign, TrendingUp, Calendar, Activity, Edit, Trash } from 'lucide-react';
 import AddRecordForm from '../components/AddRecordForm';
+import EditRecordForm from '../components/EditRecordForm';
 import { format } from 'date-fns';
 import './Dashboard.css';
 
@@ -9,6 +10,7 @@ export default function Dashboard({ selectedStaff }) {
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [editingRecord, setEditingRecord] = useState(null);
   const [search, setSearch] = useState('');
   const [filterDate, setFilterDate] = useState('');
   
@@ -47,6 +49,13 @@ export default function Dashboard({ selectedStaff }) {
     const matchDate = filterDate ? r.service_date === filterDate : true;
     return matchSearch && matchDate;
   });
+
+  const handleDeleteRecord = async (id) => {
+    if (window.confirm("Are you sure you want to delete this record? This action cannot be undone.")) {
+      await supabase.from('records').delete().eq('id', id);
+      fetchRecords(); // re-fetch immediately for instant UI refresh
+    }
+  };
 
   const exportCSV = () => {
     const headers = ['ID,Customer,Phone,Amount,Staff Commission,Staff,Date,Time,Room,Body Size,Repeat,Mallu'];
@@ -90,28 +99,28 @@ export default function Dashboard({ selectedStaff }) {
           <div className="summary-icon icon-blue"><DollarSign size={24} /></div>
           <div className="summary-details">
             <p className="summary-label">Total Earnings</p>
-            <h3 className="summary-value">${totalEarnings.toFixed(2)}</h3>
+            <h3 className="summary-value">AED {totalEarnings.toFixed(2)}</h3>
           </div>
         </div>
         <div className="summary-card glass-panel">
           <div className="summary-icon icon-green"><TrendingUp size={24} /></div>
           <div className="summary-details">
             <p className="summary-label">Total Commission</p>
-            <h3 className="summary-value">${totalCommission.toFixed(2)}</h3>
+            <h3 className="summary-value">AED {totalCommission.toFixed(2)}</h3>
           </div>
         </div>
         <div className="summary-card glass-panel">
           <div className="summary-icon icon-purple"><Calendar size={24} /></div>
           <div className="summary-details">
             <p className="summary-label">Today's Earnings</p>
-            <h3 className="summary-value">${todayEarnings.toFixed(2)}</h3>
+            <h3 className="summary-value">AED {todayEarnings.toFixed(2)}</h3>
           </div>
         </div>
         <div className="summary-card glass-panel">
           <div className="summary-icon icon-orange"><Activity size={24} /></div>
           <div className="summary-details">
             <p className="summary-label">Today's Commission</p>
-            <h3 className="summary-value">${todayCommission.toFixed(2)}</h3>
+            <h3 className="summary-value">AED {todayCommission.toFixed(2)}</h3>
           </div>
         </div>
       </div>
@@ -152,12 +161,13 @@ export default function Dashboard({ selectedStaff }) {
                 <th>Staff</th>
                 <th>Amount</th>
                 <th>Commission</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {filteredRecords.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="empty-state">No records found.</td>
+                  <td colSpan="8" className="empty-state">No records found.</td>
                 </tr>
               ) : (
                 filteredRecords.map(r => (
@@ -179,8 +189,14 @@ export default function Dashboard({ selectedStaff }) {
                       </div>
                     </td>
                     <td>{r.staff?.name || 'Unassigned'}</td>
-                    <td className="fw-600">${r.amount}</td>
-                    <td className="fw-600 text-success">${r.staff_commission}</td>
+                    <td className="fw-600">AED {Number(r.amount).toFixed(2)}</td>
+                    <td className="fw-600 text-success">AED {Number(r.staff_commission).toFixed(2)}</td>
+                    <td>
+                      <div style={{ display: 'flex', gap: '0.75rem' }}>
+                        <button onClick={() => setEditingRecord(r)} style={{ background: 'transparent', border: 'none', color: '#60a5fa', cursor: 'pointer' }}><Edit size={18} /></button>
+                        <button onClick={() => handleDeleteRecord(r.id)} style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer' }}><Trash size={18} /></button>
+                      </div>
+                    </td>
                   </tr>
                 ))
               )}
@@ -194,7 +210,17 @@ export default function Dashboard({ selectedStaff }) {
           <div className="modal-content glass-panel">
             <button className="modal-close" onClick={() => setShowAddForm(false)}>×</button>
             <h2 className="modal-title">Add New Record</h2>
-            <AddRecordForm onSuccess={() => setShowAddForm(false)} />
+            <AddRecordForm onSuccess={() => { setShowAddForm(false); fetchRecords(); }} />
+          </div>
+        </div>
+      )}
+
+      {editingRecord && (
+        <div className="modal-overlay">
+          <div className="modal-content glass-panel">
+            <button className="modal-close" onClick={() => setEditingRecord(null)}>×</button>
+            <h2 className="modal-title">Edit Record</h2>
+            <EditRecordForm initialData={editingRecord} onSuccess={() => { setEditingRecord(null); fetchRecords(); }} />
           </div>
         </div>
       )}

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { Users, User, LayoutDashboard, Plus } from 'lucide-react';
+import { Users, User, LayoutDashboard, Plus, Edit, Trash } from 'lucide-react';
 import './Sidebar.css';
 
 export default function Sidebar({ selectedStaff, setSelectedStaff }) {
@@ -9,6 +9,10 @@ export default function Sidebar({ selectedStaff, setSelectedStaff }) {
   const [showAddStaff, setShowAddStaff] = useState(false);
   const [newStaffName, setNewStaffName] = useState('');
   const [newStaffNationality, setNewStaffNationality] = useState('');
+  
+  const [editingStaff, setEditingStaff] = useState(null);
+  const [editStaffName, setEditStaffName] = useState('');
+  const [editStaffNationality, setEditStaffNationality] = useState('');
 
   useEffect(() => {
     fetchStaff();
@@ -56,6 +60,34 @@ export default function Sidebar({ selectedStaff, setSelectedStaff }) {
       setShowAddStaff(false);
       fetchStaff();
     }
+  };
+
+  const handleDeleteStaff = async (e, id) => {
+    e.stopPropagation();
+    if (window.confirm("Are you sure you want to delete this staff member? Their records will be kept as Unassigned.")) {
+      await supabase.from('staff').delete().eq('id', id);
+      fetchStaff(); // Instant UI refresh
+    }
+  };
+
+  const handleEditStaffClick = (e, staff) => {
+    e.stopPropagation();
+    setEditingStaff(staff.id);
+    setEditStaffName(staff.name);
+    setEditStaffNationality(staff.nationality || '');
+  };
+
+  const handleUpdateStaff = async (e) => {
+    e.preventDefault();
+    if (!editStaffName) return;
+    
+    await supabase.from('staff').update({ 
+      name: editStaffName, 
+      nationality: editStaffNationality 
+    }).eq('id', editingStaff);
+
+    setEditingStaff(null);
+    fetchStaff();
   };
 
   return (
@@ -106,8 +138,14 @@ export default function Sidebar({ selectedStaff, setSelectedStaff }) {
                     <User size={18} />
                     <span>{staff.name}</span>
                   </div>
-                  <div className="staff-earnings">
-                    ${Number(staff.total_earnings).toFixed(2)}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <div className="staff-earnings">
+                      AED {Number(staff.total_earnings).toFixed(2)}
+                    </div>
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <button onClick={(e) => handleEditStaffClick(e, staff)} style={{ background: 'transparent', border: 'none', color: '#60a5fa', cursor: 'pointer' }}><Edit size={14} /></button>
+                      <button onClick={(e) => handleDeleteStaff(e, staff.id)} style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer' }}><Trash size={14} /></button>
+                    </div>
                   </div>
                 </li>
               ))
@@ -132,6 +170,28 @@ export default function Sidebar({ selectedStaff, setSelectedStaff }) {
               </div>
               <button type="submit" className="btn" style={{ width: '100%', marginTop: '1rem' }}>
                 Save Staff
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {editingStaff && (
+        <div className="modal-overlay">
+          <div className="modal-content glass-panel" style={{ maxWidth: '400px' }}>
+            <button className="modal-close" onClick={() => setEditingStaff(null)}>×</button>
+            <h2 className="modal-title" style={{ fontSize: '1.25rem' }}>Edit Staff Member</h2>
+            <form onSubmit={handleUpdateStaff}>
+              <div className="form-group">
+                <label className="form-label">Name *</label>
+                <input required type="text" className="form-input" value={editStaffName} onChange={e => setEditStaffName(e.target.value)} />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Nationality</label>
+                <input type="text" className="form-input" value={editStaffNationality} onChange={e => setEditStaffNationality(e.target.value)} />
+              </div>
+              <button type="submit" className="btn" style={{ width: '100%', marginTop: '1rem' }}>
+                Update Staff
               </button>
             </form>
           </div>
