@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { Plus, Search, Download, Filter } from 'lucide-react';
+import { Plus, Search, Download, Filter, DollarSign, TrendingUp, Calendar, Activity } from 'lucide-react';
 import AddRecordForm from '../components/AddRecordForm';
+import { format } from 'date-fns';
 import './Dashboard.css';
 
 export default function Dashboard({ selectedStaff }) {
@@ -61,6 +62,12 @@ export default function Dashboard({ selectedStaff }) {
     a.click();
   };
 
+  const todayStr = format(new Date(), 'yyyy-MM-dd');
+  const totalEarnings = records.reduce((sum, r) => sum + Number(r.amount), 0);
+  const totalCommission = records.reduce((sum, r) => sum + Number(r.staff_commission), 0);
+  const todayEarnings = records.filter(r => r.service_date === todayStr).reduce((sum, r) => sum + Number(r.amount), 0);
+  const todayCommission = records.filter(r => r.service_date === todayStr).reduce((sum, r) => sum + Number(r.staff_commission), 0);
+
   return (
     <div className="dashboard">
       <div className="dashboard-header">
@@ -75,6 +82,37 @@ export default function Dashboard({ selectedStaff }) {
           <button className="btn" onClick={() => setShowAddForm(true)}>
             <Plus size={18} /> Add Record
           </button>
+        </div>
+      </div>
+
+      <div className="summary-cards">
+        <div className="summary-card glass-panel">
+          <div className="summary-icon icon-blue"><DollarSign size={24} /></div>
+          <div className="summary-details">
+            <p className="summary-label">Total Earnings</p>
+            <h3 className="summary-value">${totalEarnings.toFixed(2)}</h3>
+          </div>
+        </div>
+        <div className="summary-card glass-panel">
+          <div className="summary-icon icon-green"><TrendingUp size={24} /></div>
+          <div className="summary-details">
+            <p className="summary-label">Total Commission</p>
+            <h3 className="summary-value">${totalCommission.toFixed(2)}</h3>
+          </div>
+        </div>
+        <div className="summary-card glass-panel">
+          <div className="summary-icon icon-purple"><Calendar size={24} /></div>
+          <div className="summary-details">
+            <p className="summary-label">Today's Earnings</p>
+            <h3 className="summary-value">${todayEarnings.toFixed(2)}</h3>
+          </div>
+        </div>
+        <div className="summary-card glass-panel">
+          <div className="summary-icon icon-orange"><Activity size={24} /></div>
+          <div className="summary-details">
+            <p className="summary-label">Today's Commission</p>
+            <h3 className="summary-value">${todayCommission.toFixed(2)}</h3>
+          </div>
         </div>
       </div>
 

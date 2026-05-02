@@ -25,6 +25,53 @@
   gap: 1rem;
 }
 
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.summary-card {
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.summary-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.icon-blue { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+.icon-green { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+.icon-purple { background: rgba(139, 92, 246, 0.15); color: #a78bfa; }
+.icon-orange { background: rgba(249, 115, 22, 0.15); color: #fb923c; }
+
+.summary-details {
+  flex: 1;
+}
+
+.summary-label {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+}
+
+.summary-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+}
+
 .filters-bar {
   padding: 1rem 1.5rem;
   display: flex;
