@@ -71,7 +71,7 @@ export default function EditRecordForm({ initialData, onSuccess }) {
         <input required type="text" name="customer_name" className="form-input" value={formData.customer_name} onChange={handleChange} />
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+      <div className="grid-2-col">
         <div className="form-group">
           <label className="form-label">Phone</label>
           <input type="text" name="phone" className="form-input" value={formData.phone} onChange={handleChange} />
@@ -82,7 +82,7 @@ export default function EditRecordForm({ initialData, onSuccess }) {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+      <div className="grid-2-col">
         <div className="form-group">
           <label className="form-label">Total Amount *</label>
           <input required type="number" step="0.01" name="amount" className="form-input" value={formData.amount} onChange={handleChange} />
@@ -101,7 +101,7 @@ export default function EditRecordForm({ initialData, onSuccess }) {
         </select>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+      <div className="grid-2-col">
         <div className="form-group">
           <label className="form-label">Date *</label>
           <input required type="date" name="service_date" className="form-input" value={formData.service_date} onChange={handleChange} />
@@ -112,7 +112,7 @@ export default function EditRecordForm({ initialData, onSuccess }) {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
+      <div className="grid-3-col">
         <div className="form-group">
           <label className="form-label">Room No</label>
           <input type="text" name="room_number" className="form-input" value={formData.room_number} onChange={handleChange} />
@@ -137,7 +137,7 @@ export default function EditRecordForm({ initialData, onSuccess }) {
         <input type="text" name="behavior" className="form-input" value={formData.behavior} onChange={handleChange} />
       </div>
 
-      <div style={{ display: 'flex', gap: '2rem', marginBottom: '1.5rem', marginTop: '1rem' }}>
+      <div className="form-checkbox-container">
         <label className="form-checkbox">
           <input type="checkbox" name="repeat_customer" checked={formData.repeat_customer} onChange={handleChange} />
           <span>Repeat Customer</span>

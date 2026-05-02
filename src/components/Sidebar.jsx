@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase';
 import { Users, User, LayoutDashboard, Plus, Edit, Trash } from 'lucide-react';
 import './Sidebar.css';
 
-export default function Sidebar({ selectedStaff, setSelectedStaff }) {
+export default function Sidebar({ selectedStaff, setSelectedStaff, isOpen, setIsOpen }) {
   const [staffList, setStaffList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddStaff, setShowAddStaff] = useState(false);
@@ -91,7 +91,9 @@ export default function Sidebar({ selectedStaff, setSelectedStaff }) {
   };
 
   return (
-    <aside className="sidebar glass-panel">
+    <>
+      {isOpen && <div className="sidebar-mobile-overlay" onClick={() => setIsOpen(false)}></div>}
+      <aside className={`sidebar glass-panel ${isOpen ? 'open' : ''}`}>
       <div className="sidebar-header">
         <h1 className="logo">
           <LayoutDashboard className="logo-icon" size={24} />
@@ -117,7 +119,7 @@ export default function Sidebar({ selectedStaff, setSelectedStaff }) {
           <ul className="staff-list">
             <li 
               className={`staff-item ${!selectedStaff ? 'active' : ''}`}
-              onClick={() => setSelectedStaff(null)}
+              onClick={() => { setSelectedStaff(null); setIsOpen(false); }}
             >
               <div className="staff-info">
                 <User size={18} />
@@ -132,7 +134,7 @@ export default function Sidebar({ selectedStaff, setSelectedStaff }) {
                 <li 
                   key={staff.id} 
                   className={`staff-item ${selectedStaff === staff.id ? 'active' : ''}`}
-                  onClick={() => setSelectedStaff(staff.id)}
+                  onClick={() => { setSelectedStaff(staff.id); setIsOpen(false); }}
                 >
                   <div className="staff-info">
                     <User size={18} />
@@ -198,5 +200,6 @@ export default function Sidebar({ selectedStaff, setSelectedStaff }) {
         </div>
       )}
     </aside>
+    </>
   );
 }

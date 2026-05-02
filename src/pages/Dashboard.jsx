@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { Plus, Search, Download, Filter, DollarSign, TrendingUp, Calendar, Activity, Edit, Trash } from 'lucide-react';
+import { Plus, Search, Download, Filter, DollarSign, TrendingUp, Calendar, Activity, Edit, Trash, Menu } from 'lucide-react';
 import AddRecordForm from '../components/AddRecordForm';
 import EditRecordForm from '../components/EditRecordForm';
 import { format } from 'date-fns';
 import './Dashboard.css';
 
-export default function Dashboard({ selectedStaff }) {
+export default function Dashboard({ selectedStaff, setIsMobileMenuOpen }) {
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -80,9 +80,14 @@ export default function Dashboard({ selectedStaff }) {
   return (
     <div className="dashboard">
       <div className="dashboard-header">
-        <div>
-          <h1 className="page-title">Business Records</h1>
-          <p className="page-subtitle">Manage and track your business activities seamlessly.</p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <button className="mobile-menu-btn" onClick={() => setIsMobileMenuOpen(true)}>
+            <Menu size={24} />
+          </button>
+          <div>
+            <h1 className="page-title">Business Records</h1>
+            <p className="page-subtitle">Manage and track your business activities seamlessly.</p>
+          </div>
         </div>
         <div className="header-actions">
           <button className="btn btn-outline" onClick={exportCSV}>

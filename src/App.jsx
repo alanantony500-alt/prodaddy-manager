@@ -5,14 +5,20 @@ import Dashboard from './pages/Dashboard';
 
 function App() {
   const [selectedStaff, setSelectedStaff] = useState(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
     <Router>
       <div className="app-container">
-        <Sidebar selectedStaff={selectedStaff} setSelectedStaff={setSelectedStaff} />
-        <main style={{ flex: 1, overflowY: 'auto', padding: '2rem' }}>
+        <Sidebar 
+          selectedStaff={selectedStaff} 
+          setSelectedStaff={setSelectedStaff} 
+          isOpen={isMobileMenuOpen} 
+          setIsOpen={setIsMobileMenuOpen} 
+        />
+        <main className="main-content" style={{ flex: 1, overflowY: 'auto', padding: '2rem' }}>
           <Routes>
-            <Route path="/" element={<Dashboard selectedStaff={selectedStaff} />} />
+            <Route path="/" element={<Dashboard selectedStaff={selectedStaff} setIsMobileMenuOpen={setIsMobileMenuOpen} />} />
           </Routes>
         </main>
       </div>

@@ -135,3 +135,39 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);
 }
+
+/* Responsive Grid Classes for Forms */
+.grid-2-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.grid-3-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+}
+
+.form-checkbox-container {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+  margin-top: 1rem;
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding: 1rem !important;
+  }
+  
+  .grid-2-col, .grid-3-col {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  
+  .form-checkbox-container {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}

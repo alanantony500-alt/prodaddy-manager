@@ -85,3 +85,29 @@
   color: var(--success);
   font-size: 0.875rem;
 }
+
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: -280px;
+    z-index: 1000;
+    transition: left 0.3s ease;
+    border-right: 1px solid var(--glass-border);
+  }
+  
+  .sidebar.open {
+    left: 0;
+  }
+}
+
+.sidebar-mobile-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+  z-index: 999;
+}
