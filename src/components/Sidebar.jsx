@@ -133,8 +133,8 @@ export default function Sidebar({ selectedStaff, setSelectedStaff, isOpen, setIs
               staffList.map((staff) => (
                 <li 
                   key={staff.id} 
-                  className={`staff-item ${selectedStaff === staff.id ? 'active' : ''}`}
-                  onClick={() => { setSelectedStaff(staff.id); setIsOpen(false); }}
+                  className={`staff-item ${selectedStaff?.id === staff.id ? 'active' : ''}`}
+                  onClick={() => { setSelectedStaff(staff); setIsOpen(false); }}
                 >
                   <div className="staff-info">
                     <User size={18} />

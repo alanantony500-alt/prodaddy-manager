@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { Plus, Search, Download, Filter, DollarSign, TrendingUp, Calendar, Activity, Edit, Trash, Menu } from 'lucide-react';
+import { Plus, Search, Download, Filter, DollarSign, TrendingUp, Calendar, Activity, Edit, Trash, Menu, UserCircle } from 'lucide-react';
 import AddRecordForm from '../components/AddRecordForm';
 import EditRecordForm from '../components/EditRecordForm';
 import { format } from 'date-fns';
@@ -27,17 +27,11 @@ export default function Dashboard({ selectedStaff, setIsMobileMenuOpen }) {
     return () => {
       supabase.removeChannel(subscription);
     };
-  }, [selectedStaff]);
+  }, []);
 
   const fetchRecords = async () => {
     setLoading(true);
-    let query = supabase.from('records').select('*, staff(name)').order('created_at', { ascending: false });
-    
-    if (selectedStaff) {
-      query = query.eq('staff_id', selectedStaff);
-    }
-    
-    const { data, error } = await query;
+    const { data, error } = await supabase.from('records').select('*, staff(name)').order('created_at', { ascending: false });
     if (data) setRecords(data);
     setLoading(false);
   };
@@ -46,8 +40,9 @@ export default function Dashboard({ selectedStaff, setIsMobileMenuOpen }) {
     const matchSearch = r.customer_name?.toLowerCase().includes(search.toLowerCase()) || 
                         r.phone?.includes(search) || 
                         r.room_number?.toLowerCase().includes(search.toLowerCase());
+    const matchStaff = selectedStaff ? r.staff_id === selectedStaff.id : true;
     const matchDate = filterDate ? r.service_date === filterDate : true;
-    return matchSearch && matchDate;
+    return matchSearch && matchStaff && matchDate;
   });
 
   const handleDeleteRecord = async (id) => {
@@ -76,6 +71,15 @@ export default function Dashboard({ selectedStaff, setIsMobileMenuOpen }) {
   const totalCommission = records.reduce((sum, r) => sum + Number(r.staff_commission), 0);
   const todayEarnings = records.filter(r => r.service_date === todayStr).reduce((sum, r) => sum + Number(r.amount), 0);
   const todayCommission = records.filter(r => r.service_date === todayStr).reduce((sum, r) => sum + Number(r.staff_commission), 0);
+
+  let staffTotalEarnings = 0, staffTotalCommission = 0, staffTodayEarnings = 0, staffTodayCommission = 0;
+  if (selectedStaff) {
+    const staffRecords = records.filter(r => r.staff_id === selectedStaff.id);
+    staffTotalEarnings = staffRecords.reduce((sum, r) => sum + Number(r.amount), 0);
+    staffTotalCommission = staffRecords.reduce((sum, r) => sum + Number(r.staff_commission), 0);
+    staffTodayEarnings = staffRecords.filter(r => r.service_date === todayStr).reduce((sum, r) => sum + Number(r.amount), 0);
+    staffTodayCommission = staffRecords.filter(r => r.service_date === todayStr).reduce((sum, r) => sum + Number(r.staff_commission), 0);
+  }
 
   return (
     <div className="dashboard">
@@ -151,6 +155,32 @@ export default function Dashboard({ selectedStaff, setIsMobileMenuOpen }) {
           />
         </div>
       </div>
+
+      {selectedStaff && (
+        <div className="staff-analytics-card glass-panel highlight-card">
+          <div className="staff-analytics-header">
+            <h3><UserCircle size={20} className="icon-blue" style={{ background: 'none' }} /> {selectedStaff.name}'s Analytics</h3>
+          </div>
+          <div className="staff-analytics-grid">
+            <div className="mini-stat">
+              <span className="mini-stat-label">Total Earnings</span>
+              <span className="mini-stat-value">AED {staffTotalEarnings.toFixed(2)}</span>
+            </div>
+            <div className="mini-stat">
+              <span className="mini-stat-label">Total Commission</span>
+              <span className="mini-stat-value text-success">AED {staffTotalCommission.toFixed(2)}</span>
+            </div>
+            <div className="mini-stat">
+              <span className="mini-stat-label">Today's Earnings</span>
+              <span className="mini-stat-value">AED {staffTodayEarnings.toFixed(2)}</span>
+            </div>
+            <div className="mini-stat">
+              <span className="mini-stat-label">Today's Commission</span>
+              <span className="mini-stat-value text-success">AED {staffTodayCommission.toFixed(2)}</span>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="records-table-container glass-panel">
         {loading ? (
