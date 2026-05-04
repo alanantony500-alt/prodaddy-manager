@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { Users, User, LayoutDashboard, Plus, Edit, Trash } from 'lucide-react';
+import { format } from 'date-fns';
 import './Sidebar.css';
 
-export default function Sidebar({ selectedStaff, setSelectedStaff, isOpen, setIsOpen }) {
+export default function Sidebar({ selectedStaff, setSelectedStaff, isOpen, setIsOpen, records = [] }) {
   const [staffList, setStaffList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddStaff, setShowAddStaff] = useState(false);
@@ -132,27 +133,82 @@ export default function Sidebar({ selectedStaff, setSelectedStaff, isOpen, setIs
             {loading ? (
               <div style={{ padding: '1rem', color: 'var(--text-muted)' }}>Loading...</div>
             ) : (
-              staffList.map((staff) => (
-                <li 
-                  key={staff.id} 
-                  className={`staff-item ${selectedStaff?.id === staff.id ? 'active' : ''}`}
-                  onClick={() => { setSelectedStaff(staff); setIsOpen(false); }}
-                >
-                  <div className="staff-header">
-                    <div className="staff-info">
-                      <User size={18} className="flex-shrink-0" />
-                      <span className="staff-name-text">{staff.name}</span>
+              staffList.map((staff) => {
+                const isDeepa = staff.name.toLowerCase() === 'deepa';
+
+                if (isDeepa) {
+                  const deepaRecords = records.filter(r => r.staff_id === staff.id);
+                  const todayStr = format(new Date(), 'yyyy-MM-dd');
+                  
+                  const companyCommission = deepaRecords.reduce((sum, r) => sum + Number(r.staff_commission), 0);
+                  const deepaNetEarnings = deepaRecords.reduce((sum, r) => sum + (Number(r.amount) - Number(r.staff_commission)), 0);
+                  
+                  const todayRecords = deepaRecords.filter(r => r.service_date === todayStr);
+                  const todayCommission = todayRecords.reduce((sum, r) => sum + Number(r.staff_commission), 0);
+                  const todayNetEarnings = todayRecords.reduce((sum, r) => sum + (Number(r.amount) - Number(r.staff_commission)), 0);
+
+                  return (
+                    <li 
+                      key={staff.id} 
+                      className={`staff-item deepa-card ${selectedStaff?.id === staff.id ? 'active' : ''}`}
+                      onClick={() => { setSelectedStaff(staff); setIsOpen(false); }}
+                    >
+                      <div className="staff-header">
+                        <div className="staff-info">
+                          <User size={18} className="flex-shrink-0 deepa-accent-text" />
+                          <span className="staff-name-text deepa-accent-text">{staff.name}</span>
+                        </div>
+                        <div className="staff-actions">
+                          <button onClick={(e) => handleEditStaffClick(e, staff)} className="staff-action-btn edit"><Edit size={14} /></button>
+                          <button onClick={(e) => handleDeleteStaff(e, staff.id)} className="staff-action-btn delete"><Trash size={14} /></button>
+                        </div>
+                      </div>
+
+                      <div className="deepa-stats">
+                        <div className="deepa-stat-row">
+                          <span className="deepa-label">Company Commission</span>
+                          <span className="deepa-value">AED {companyCommission.toFixed(2)}</span>
+                        </div>
+                        <div className="deepa-stat-row">
+                          <span className="deepa-label">Deepa Net Earnings</span>
+                          <span className="deepa-value highlight">AED {deepaNetEarnings.toFixed(2)}</span>
+                        </div>
+                        <div className="deepa-divider"></div>
+                        <div className="deepa-stat-row">
+                          <span className="deepa-label">Today Commission</span>
+                          <span className="deepa-value">AED {todayCommission.toFixed(2)}</span>
+                        </div>
+                        <div className="deepa-stat-row">
+                          <span className="deepa-label">Today Net Earnings</span>
+                          <span className="deepa-value highlight">AED {todayNetEarnings.toFixed(2)}</span>
+                        </div>
+                      </div>
+                    </li>
+                  );
+                }
+
+                return (
+                  <li 
+                    key={staff.id} 
+                    className={`staff-item ${selectedStaff?.id === staff.id ? 'active' : ''}`}
+                    onClick={() => { setSelectedStaff(staff); setIsOpen(false); }}
+                  >
+                    <div className="staff-header">
+                      <div className="staff-info">
+                        <User size={18} className="flex-shrink-0" />
+                        <span className="staff-name-text">{staff.name}</span>
+                      </div>
+                      <div className="staff-actions">
+                        <button onClick={(e) => handleEditStaffClick(e, staff)} className="staff-action-btn edit"><Edit size={14} /></button>
+                        <button onClick={(e) => handleDeleteStaff(e, staff.id)} className="staff-action-btn delete"><Trash size={14} /></button>
+                      </div>
                     </div>
-                    <div className="staff-actions">
-                      <button onClick={(e) => handleEditStaffClick(e, staff)} className="staff-action-btn edit"><Edit size={14} /></button>
-                      <button onClick={(e) => handleDeleteStaff(e, staff.id)} className="staff-action-btn delete"><Trash size={14} /></button>
+                    <div className="staff-earnings">
+                      AED {Number(staff.total_earnings).toFixed(2)}
                     </div>
-                  </div>
-                  <div className="staff-earnings">
-                    AED {Number(staff.total_earnings).toFixed(2)}
-                  </div>
-                </li>
-              ))
+                  </li>
+                );
+              })
             )}
           </ul>
         </div>

@@ -6,35 +6,11 @@ import EditRecordForm from '../components/EditRecordForm';
 import { format } from 'date-fns';
 import './Dashboard.css';
 
-export default function Dashboard({ selectedStaff, setIsMobileMenuOpen }) {
-  const [records, setRecords] = useState([]);
-  const [loading, setLoading] = useState(true);
+export default function Dashboard({ selectedStaff, setIsMobileMenuOpen, records, loadingRecords: loading, fetchRecords }) {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
   const [search, setSearch] = useState('');
   const [filterDate, setFilterDate] = useState('');
-  
-  useEffect(() => {
-    fetchRecords();
-    
-    const subscription = supabase
-      .channel('records_changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'records' }, () => {
-        fetchRecords();
-      })
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(subscription);
-    };
-  }, []);
-
-  const fetchRecords = async () => {
-    setLoading(true);
-    const { data, error } = await supabase.from('records').select('*, staff(name)').order('created_at', { ascending: false });
-    if (data) setRecords(data);
-    setLoading(false);
-  };
 
   const filteredRecords = records.filter(r => {
     const matchSearch = r.customer_name?.toLowerCase().includes(search.toLowerCase()) || 

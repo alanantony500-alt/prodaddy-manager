@@ -157,3 +157,60 @@
   backdrop-filter: blur(2px);
   z-index: 999;
 }
+
+/* Deepa Custom Card Styles */
+.deepa-card {
+  background: rgba(16, 185, 129, 0.05);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  padding: 1.25rem 1rem;
+}
+
+.deepa-card:hover {
+  background: rgba(16, 185, 129, 0.1) !important;
+}
+
+.deepa-card.active {
+  background: rgba(16, 185, 129, 0.15) !important;
+  border-color: rgba(16, 185, 129, 0.4) !important;
+}
+
+.deepa-accent-text {
+  color: #10b981 !important;
+}
+
+.deepa-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  margin-top: 0.75rem;
+}
+
+.deepa-stat-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.deepa-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.deepa-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.deepa-value.highlight {
+  color: #10b981;
+}
+
+.deepa-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 0.25rem 0;
+}
