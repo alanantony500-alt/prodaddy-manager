@@ -135,7 +135,10 @@ export default function Sidebar({ selectedStaff, setSelectedStaff, isOpen, setIs
             {loading ? (
               <div style={{ padding: '1rem', color: 'var(--text-muted)' }}>Loading...</div>
             ) : (
-              staffList.filter(s => isSeparateRoute ? s.is_separate : !s.is_separate).map((staff) => (
+              (isSeparateRoute 
+                ? staffList.filter(s => s.is_separate === true) 
+                : staffList.filter(s => s.is_separate !== true)
+              ).map((staff) => (
                 <li 
                   key={staff.id} 
                   className={`staff-item ${selectedStaff === staff.id ? 'active' : ''}`}

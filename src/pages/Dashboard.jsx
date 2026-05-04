@@ -42,8 +42,12 @@ export default function Dashboard({ selectedStaff, setIsMobileMenuOpen, isSepara
     setLoading(false);
   };
 
-  // STRICT FILTERING RULE
-  const displayRecords = records.filter(r => isSeparateRoute ? r.staff?.is_separate : !r.staff?.is_separate);
+  // 1. Split records into two distinct data sources based on staff.is_separate
+  const normalStaffRecords = records.filter(r => r.staff?.is_separate !== true);
+  const separateStaffRecords = records.filter(r => r.staff?.is_separate === true);
+
+  // 2. Select the correct data source based on the route
+  const displayRecords = isSeparateRoute ? separateStaffRecords : normalStaffRecords;
 
   const filteredRecords = displayRecords.filter(r => {
     const matchSearch = r.customer_name?.toLowerCase().includes(search.toLowerCase()) || 
