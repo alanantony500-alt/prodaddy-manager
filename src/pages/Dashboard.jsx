@@ -31,6 +31,12 @@ export default function Dashboard({ selectedStaff, setIsMobileMenuOpen, isSepara
 
   const fetchRecords = async () => {
     setLoading(true);
+
+    // 1. Fetch fresh staff flags to completely bypass Supabase's delayed join cache
+    const { data: staffData } = await supabase.from('staff').select('id, is_separate');
+    const separateIds = new Set(staffData?.filter(s => s.is_separate === true).map(s => s.id) || []);
+
+    // 2. Requested query
     let query = supabase.from('records').select('*, staff(name, is_separate)').order('created_at', { ascending: false });
     
     if (selectedStaff) {
@@ -38,16 +44,23 @@ export default function Dashboard({ selectedStaff, setIsMobileMenuOpen, isSepara
     }
     
     const { data, error } = await query;
-    if (data) setRecords(data);
+    if (data) {
+      // 3. OVERRIDE any cached null/false values with the live true/false flags
+      const fixedRecords = data.map(r => ({
+        ...r,
+        staff: r.staff ? { ...r.staff, is_separate: separateIds.has(r.staff_id) } : null
+      }));
+      setRecords(fixedRecords);
+    }
     setLoading(false);
   };
 
-  // 1. Split records into two distinct data sources based on staff.is_separate
-  const normalStaffRecords = records.filter(r => r.staff?.is_separate !== true);
-  const separateStaffRecords = records.filter(r => r.staff?.is_separate === true);
+  // 1. Split records into normalRecords and separateRecords
+  const normalRecords = records.filter(r => r.staff?.is_separate !== true);
+  const separateRecords = records.filter(r => r.staff?.is_separate === true);
 
-  // 2. Select the correct data source based on the route
-  const displayRecords = isSeparateRoute ? separateStaffRecords : normalStaffRecords;
+  // 2. MAIN DASHBOARD MUST USE ONLY normalRecords (DEEPA PROFILE ONLY separateRecords)
+  const displayRecords = isSeparateRoute ? separateRecords : normalRecords;
 
   const filteredRecords = displayRecords.filter(r => {
     const matchSearch = r.customer_name?.toLowerCase().includes(search.toLowerCase()) || 
@@ -87,7 +100,7 @@ export default function Dashboard({ selectedStaff, setIsMobileMenuOpen, isSepara
   return (
     <div className="dashboard">
       <div className="dashboard-header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        <div className="dashboard-title-wrapper" style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
           <button className="mobile-menu-btn" onClick={() => setIsMobileMenuOpen(true)}>
             <Menu size={24} />
           </button>
@@ -96,7 +109,7 @@ export default function Dashboard({ selectedStaff, setIsMobileMenuOpen, isSepara
             <p className="page-subtitle">Manage and track your business activities seamlessly.</p>
           </div>
         </div>
-        <div className="header-actions">
+        <div className="header-actions" style={{ flexWrap: 'wrap' }}>
           <button className="btn btn-outline" onClick={exportCSV}>
             <Download size={18} /> Export CSV
           </button>
