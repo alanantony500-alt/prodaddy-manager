@@ -51,14 +51,15 @@
 
 .staff-item {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
   padding: 0.75rem 1rem;
   border-radius: 0.5rem;
   cursor: pointer;
   transition: all 0.2s;
   margin-bottom: 0.75rem;
   color: var(--text-muted);
+  width: 100%;
 }
 
 .staff-item:hover {
@@ -72,32 +73,36 @@
   border: 1px solid rgba(99, 102, 241, 0.3);
 }
 
+.staff-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 0.25rem;
+}
+
 .staff-info {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  font-weight: 500;
-  max-width: 65%;
+  font-weight: 600;
+  max-width: 70%;
 }
 
 .staff-name-text {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.staff-stats-container {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
+  font-size: 1rem;
+  color: var(--text-main);
 }
 
 .staff-earnings {
-  font-weight: 600;
-  color: var(--success);
+  font-weight: 500;
+  color: var(--text-muted);
   font-size: 0.875rem;
   white-space: nowrap;
-  text-align: right;
+  padding-left: 2.25rem;
 }
 
 .staff-actions {
