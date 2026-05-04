@@ -137,16 +137,16 @@ export default function Sidebar({ selectedStaff, setSelectedStaff, isOpen, setIs
                   onClick={() => { setSelectedStaff(staff); setIsOpen(false); }}
                 >
                   <div className="staff-info">
-                    <User size={18} />
-                    <span>{staff.name}</span>
+                    <User size={18} className="flex-shrink-0" />
+                    <span className="staff-name-text">{staff.name}</span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <div className="staff-stats-container">
                     <div className="staff-earnings">
                       AED {Number(staff.total_earnings).toFixed(2)}
                     </div>
-                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                      <button onClick={(e) => handleEditStaffClick(e, staff)} style={{ background: 'transparent', border: 'none', color: '#60a5fa', cursor: 'pointer' }}><Edit size={14} /></button>
-                      <button onClick={(e) => handleDeleteStaff(e, staff.id)} style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer' }}><Trash size={14} /></button>
+                    <div className="staff-actions">
+                      <button onClick={(e) => handleEditStaffClick(e, staff)} className="staff-action-btn edit"><Edit size={14} /></button>
+                      <button onClick={(e) => handleDeleteStaff(e, staff.id)} className="staff-action-btn delete"><Trash size={14} /></button>
                     </div>
                   </div>
                 </li>
