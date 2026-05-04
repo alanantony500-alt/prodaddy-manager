@@ -122,11 +122,9 @@ export default function Sidebar({ selectedStaff, setSelectedStaff, isOpen, setIs
               className={`staff-item ${!selectedStaff ? 'active' : ''}`}
               onClick={() => { setSelectedStaff(null); setIsOpen(false); }}
             >
-              <div className="staff-header">
-                <div className="staff-info">
-                  <User size={18} className="flex-shrink-0" />
-                  <span className="staff-name-text">All Records</span>
-                </div>
+              <div className="staff-info">
+                <User size={18} className="flex-shrink-0" />
+                <span className="staff-name-text">All Records</span>
               </div>
             </li>
             
@@ -193,18 +191,18 @@ export default function Sidebar({ selectedStaff, setSelectedStaff, isOpen, setIs
                     className={`staff-item ${selectedStaff?.id === staff.id ? 'active' : ''}`}
                     onClick={() => { setSelectedStaff(staff); setIsOpen(false); }}
                   >
-                    <div className="staff-header">
-                      <div className="staff-info">
-                        <User size={18} className="flex-shrink-0" />
-                        <span className="staff-name-text">{staff.name}</span>
+                    <div className="staff-info">
+                      <User size={18} className="flex-shrink-0" />
+                      <span className="staff-name-text">{staff.name}</span>
+                    </div>
+                    <div className="staff-stats-container">
+                      <div className="staff-earnings">
+                        AED {Number(staff.total_earnings).toFixed(2)}
                       </div>
                       <div className="staff-actions">
                         <button onClick={(e) => handleEditStaffClick(e, staff)} className="staff-action-btn edit"><Edit size={14} /></button>
                         <button onClick={(e) => handleDeleteStaff(e, staff.id)} className="staff-action-btn delete"><Trash size={14} /></button>
                       </div>
-                    </div>
-                    <div className="staff-earnings">
-                      AED {Number(staff.total_earnings).toFixed(2)}
                     </div>
                   </li>
                 );

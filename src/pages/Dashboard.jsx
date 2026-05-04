@@ -43,10 +43,11 @@ export default function Dashboard({ selectedStaff, setIsMobileMenuOpen, records,
   };
 
   const todayStr = format(new Date(), 'yyyy-MM-dd');
-  const totalEarnings = records.reduce((sum, r) => sum + Number(r.amount), 0);
-  const totalCommission = records.reduce((sum, r) => sum + Number(r.staff_commission), 0);
-  const todayEarnings = records.filter(r => r.service_date === todayStr).reduce((sum, r) => sum + Number(r.amount), 0);
-  const todayCommission = records.filter(r => r.service_date === todayStr).reduce((sum, r) => sum + Number(r.staff_commission), 0);
+  const nonDeepaRecords = records.filter(r => r.staff?.name?.toLowerCase() !== 'deepa');
+  const totalEarnings = nonDeepaRecords.reduce((sum, r) => sum + Number(r.amount), 0);
+  const totalCommission = nonDeepaRecords.reduce((sum, r) => sum + Number(r.staff_commission), 0);
+  const todayEarnings = nonDeepaRecords.filter(r => r.service_date === todayStr).reduce((sum, r) => sum + Number(r.amount), 0);
+  const todayCommission = nonDeepaRecords.filter(r => r.service_date === todayStr).reduce((sum, r) => sum + Number(r.staff_commission), 0);
 
   let staffTotalEarnings = 0, staffTotalCommission = 0, staffTodayEarnings = 0, staffTodayCommission = 0;
   if (selectedStaff) {

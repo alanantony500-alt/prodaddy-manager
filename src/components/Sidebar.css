@@ -51,8 +51,8 @@
 
 .staff-item {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  justify-content: space-between;
+  align-items: center;
   padding: 0.75rem 1rem;
   border-radius: 0.5rem;
   cursor: pointer;
@@ -86,7 +86,7 @@
   align-items: center;
   gap: 0.75rem;
   font-weight: 600;
-  max-width: 70%;
+  max-width: 50%;
 }
 
 .staff-name-text {
@@ -97,12 +97,20 @@
   color: var(--text-main);
 }
 
+.staff-stats-container {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  justify-content: flex-end;
+}
+
 .staff-earnings {
   font-weight: 500;
-  color: var(--text-muted);
+  color: var(--success);
   font-size: 0.875rem;
   white-space: nowrap;
-  padding-left: 2.25rem;
+  text-align: right;
 }
 
 .staff-actions {
@@ -163,6 +171,8 @@
   background: rgba(16, 185, 129, 0.05);
   border: 1px solid rgba(16, 185, 129, 0.2);
   padding: 1.25rem 1rem;
+  flex-direction: column !important;
+  align-items: flex-start !important;
 }
 
 .deepa-card:hover {
