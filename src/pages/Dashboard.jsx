@@ -1,24 +1,56 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { Plus, Search, Download, Filter, DollarSign, TrendingUp, Calendar, Activity, Edit, Trash, Menu, UserCircle } from 'lucide-react';
+import { Plus, Search, Download, Filter, DollarSign, TrendingUp, Calendar, Activity, Edit, Trash, Menu } from 'lucide-react';
 import AddRecordForm from '../components/AddRecordForm';
 import EditRecordForm from '../components/EditRecordForm';
 import { format } from 'date-fns';
 import './Dashboard.css';
 
-export default function Dashboard({ selectedStaff, setIsMobileMenuOpen, records, loadingRecords: loading, fetchRecords }) {
+export default function Dashboard({ selectedStaff, setIsMobileMenuOpen, isSeparateRoute = false }) {
+  const [records, setRecords] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
   const [search, setSearch] = useState('');
   const [filterDate, setFilterDate] = useState('');
+  
+  useEffect(() => {
+    fetchRecords();
+    
+    const subscription = supabase
+      .channel('records_changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'records' }, () => {
+        fetchRecords();
+      })
+      .subscribe();
 
-  const filteredRecords = records.filter(r => {
+    return () => {
+      supabase.removeChannel(subscription);
+    };
+  }, [selectedStaff]);
+
+  const fetchRecords = async () => {
+    setLoading(true);
+    let query = supabase.from('records').select('*, staff(name, is_separate)').order('created_at', { ascending: false });
+    
+    if (selectedStaff) {
+      query = query.eq('staff_id', selectedStaff);
+    }
+    
+    const { data, error } = await query;
+    if (data) setRecords(data);
+    setLoading(false);
+  };
+
+  // STRICT FILTERING RULE
+  const displayRecords = records.filter(r => isSeparateRoute ? r.staff?.is_separate : !r.staff?.is_separate);
+
+  const filteredRecords = displayRecords.filter(r => {
     const matchSearch = r.customer_name?.toLowerCase().includes(search.toLowerCase()) || 
                         r.phone?.includes(search) || 
                         r.room_number?.toLowerCase().includes(search.toLowerCase());
-    const matchStaff = selectedStaff ? r.staff_id === selectedStaff.id : true;
     const matchDate = filterDate ? r.service_date === filterDate : true;
-    return matchSearch && matchStaff && matchDate;
+    return matchSearch && matchDate;
   });
 
   const handleDeleteRecord = async (id) => {
@@ -43,20 +75,10 @@ export default function Dashboard({ selectedStaff, setIsMobileMenuOpen, records,
   };
 
   const todayStr = format(new Date(), 'yyyy-MM-dd');
-  const nonDeepaRecords = records.filter(r => r.staff?.name?.toLowerCase() !== 'deepa');
-  const totalEarnings = nonDeepaRecords.reduce((sum, r) => sum + Number(r.amount), 0);
-  const totalCommission = nonDeepaRecords.reduce((sum, r) => sum + Number(r.staff_commission), 0);
-  const todayEarnings = nonDeepaRecords.filter(r => r.service_date === todayStr).reduce((sum, r) => sum + Number(r.amount), 0);
-  const todayCommission = nonDeepaRecords.filter(r => r.service_date === todayStr).reduce((sum, r) => sum + Number(r.staff_commission), 0);
-
-  let staffTotalEarnings = 0, staffTotalCommission = 0, staffTodayEarnings = 0, staffTodayCommission = 0;
-  if (selectedStaff) {
-    const staffRecords = records.filter(r => r.staff_id === selectedStaff.id);
-    staffTotalEarnings = staffRecords.reduce((sum, r) => sum + Number(r.amount), 0);
-    staffTotalCommission = staffRecords.reduce((sum, r) => sum + Number(r.staff_commission), 0);
-    staffTodayEarnings = staffRecords.filter(r => r.service_date === todayStr).reduce((sum, r) => sum + Number(r.amount), 0);
-    staffTodayCommission = staffRecords.filter(r => r.service_date === todayStr).reduce((sum, r) => sum + Number(r.staff_commission), 0);
-  }
+  const totalEarnings = displayRecords.reduce((sum, r) => sum + Number(r.amount), 0);
+  const totalCommission = displayRecords.reduce((sum, r) => sum + Number(r.staff_commission), 0);
+  const todayEarnings = displayRecords.filter(r => r.service_date === todayStr).reduce((sum, r) => sum + Number(r.amount), 0);
+  const todayCommission = displayRecords.filter(r => r.service_date === todayStr).reduce((sum, r) => sum + Number(r.staff_commission), 0);
 
   return (
     <div className="dashboard">
@@ -66,7 +88,7 @@ export default function Dashboard({ selectedStaff, setIsMobileMenuOpen, records,
             <Menu size={24} />
           </button>
           <div>
-            <h1 className="page-title">Business Records</h1>
+            <h1 className="page-title">{isSeparateRoute ? 'Separate Dashboard' : 'Business Records'}</h1>
             <p className="page-subtitle">Manage and track your business activities seamlessly.</p>
           </div>
         </div>
@@ -133,32 +155,6 @@ export default function Dashboard({ selectedStaff, setIsMobileMenuOpen, records,
         </div>
       </div>
 
-      {selectedStaff && (
-        <div className="staff-analytics-card glass-panel highlight-card">
-          <div className="staff-analytics-header">
-            <h3><UserCircle size={20} className="icon-blue" style={{ background: 'none' }} /> {selectedStaff.name}'s Analytics</h3>
-          </div>
-          <div className="staff-analytics-grid">
-            <div className="mini-stat">
-              <span className="mini-stat-label">Total Earnings</span>
-              <span className="mini-stat-value">AED {staffTotalEarnings.toFixed(2)}</span>
-            </div>
-            <div className="mini-stat">
-              <span className="mini-stat-label">Total Commission</span>
-              <span className="mini-stat-value text-success">AED {staffTotalCommission.toFixed(2)}</span>
-            </div>
-            <div className="mini-stat">
-              <span className="mini-stat-label">Today's Earnings</span>
-              <span className="mini-stat-value">AED {staffTodayEarnings.toFixed(2)}</span>
-            </div>
-            <div className="mini-stat">
-              <span className="mini-stat-label">Today's Commission</span>
-              <span className="mini-stat-value text-success">AED {staffTodayCommission.toFixed(2)}</span>
-            </div>
-          </div>
-        </div>
-      )}
-
       <div className="records-table-container glass-panel">
         {loading ? (
           <div className="loading-state">Loading records...</div>
@@ -222,7 +218,7 @@ export default function Dashboard({ selectedStaff, setIsMobileMenuOpen, records,
           <div className="modal-content glass-panel">
             <button className="modal-close" onClick={() => setShowAddForm(false)}>×</button>
             <h2 className="modal-title">Add New Record</h2>
-            <AddRecordForm onSuccess={() => { setShowAddForm(false); fetchRecords(); }} />
+            <AddRecordForm onSuccess={() => { setShowAddForm(false); fetchRecords(); }} isSeparateRoute={isSeparateRoute} />
           </div>
         </div>
       )}
@@ -232,7 +228,7 @@ export default function Dashboard({ selectedStaff, setIsMobileMenuOpen, records,
           <div className="modal-content glass-panel">
             <button className="modal-close" onClick={() => setEditingRecord(null)}>×</button>
             <h2 className="modal-title">Edit Record</h2>
-            <EditRecordForm initialData={editingRecord} onSuccess={() => { setEditingRecord(null); fetchRecords(); }} />
+            <EditRecordForm initialData={editingRecord} onSuccess={() => { setEditingRecord(null); fetchRecords(); }} isSeparateRoute={isSeparateRoute} />
           </div>
         </div>
       )}

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { format } from 'date-fns';
 
-export default function AddRecordForm({ onSuccess }) {
+export default function AddRecordForm({ onSuccess, isSeparateRoute }) {
   const [staff, setStaff] = useState([]);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -27,8 +27,10 @@ export default function AddRecordForm({ onSuccess }) {
   }, []);
 
   const fetchStaff = async () => {
-    const { data } = await supabase.from('staff').select('id, name').order('name');
-    if (data) setStaff(data);
+    const { data } = await supabase.from('staff').select('id, name, is_separate').order('name');
+    if (data) {
+      setStaff(data.filter(s => isSeparateRoute ? s.is_separate : !s.is_separate));
+    }
   };
 
   const handleChange = (e) => {

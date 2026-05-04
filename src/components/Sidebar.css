@@ -1,5 +1,6 @@
 .sidebar {
-  width: clamp(250px, 20vw, 300px);
+  width: 280px;
+  min-width: 280px;
   height: 100vh;
   border-radius: 0;
   border-left: none;
@@ -54,12 +55,11 @@
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
   color: var(--text-muted);
-  width: 100%;
 }
 
 .staff-item:hover {
@@ -73,78 +73,24 @@
   border: 1px solid rgba(99, 102, 241, 0.3);
 }
 
-.staff-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  margin-bottom: 0.25rem;
-}
-
 .staff-info {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  font-weight: 600;
-  max-width: 50%;
-}
-
-.staff-name-text {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-size: 1rem;
-  color: var(--text-main);
-}
-
-.staff-stats-container {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex: 1;
-  justify-content: flex-end;
+  font-weight: 500;
 }
 
 .staff-earnings {
-  font-weight: 500;
+  font-weight: 600;
   color: var(--success);
   font-size: 0.875rem;
-  white-space: nowrap;
-  text-align: right;
 }
 
-.staff-actions {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.staff-action-btn {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 0.25rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-}
-.staff-action-btn:hover {
-  background: rgba(255,255,255,0.1);
-}
-.staff-action-btn.edit { color: #60a5fa; }
-.staff-action-btn.delete { color: #ef4444; }
-
-.flex-shrink-0 {
-  flex-shrink: 0;
-}
-
-@media (max-width: 1024px) {
+@media (max-width: 768px) {
   .sidebar {
     position: fixed;
     top: 0;
-    left: -100%;
-    width: 80vw;
-    max-width: 320px;
+    left: -280px;
     z-index: 1000;
     transition: left 0.3s ease;
     border-right: 1px solid var(--glass-border);
@@ -164,63 +110,4 @@
   background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(2px);
   z-index: 999;
-}
-
-/* Deepa Custom Card Styles */
-.deepa-card {
-  background: rgba(16, 185, 129, 0.05);
-  border: 1px solid rgba(16, 185, 129, 0.2);
-  padding: 1.25rem 1rem;
-  flex-direction: column !important;
-  align-items: flex-start !important;
-}
-
-.deepa-card:hover {
-  background: rgba(16, 185, 129, 0.1) !important;
-}
-
-.deepa-card.active {
-  background: rgba(16, 185, 129, 0.15) !important;
-  border-color: rgba(16, 185, 129, 0.4) !important;
-}
-
-.deepa-accent-text {
-  color: #10b981 !important;
-}
-
-.deepa-stats {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  width: 100%;
-  margin-top: 0.75rem;
-}
-
-.deepa-stat-row {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-}
-
-.deepa-label {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.deepa-value {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--text-main);
-}
-
-.deepa-value.highlight {
-  color: #10b981;
-}
-
-.deepa-divider {
-  height: 1px;
-  background: rgba(255, 255, 255, 0.1);
-  margin: 0.25rem 0;
 }

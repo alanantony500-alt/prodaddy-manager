@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { Users, User, LayoutDashboard, Plus, Edit, Trash } from 'lucide-react';
-import { format } from 'date-fns';
+import { Users, User, LayoutDashboard, Plus, Edit, Trash, ArrowRightCircle } from 'lucide-react';
+import { useLocation, Link } from 'react-router-dom';
 import './Sidebar.css';
 
-export default function Sidebar({ selectedStaff, setSelectedStaff, isOpen, setIsOpen, records = [] }) {
+export default function Sidebar({ selectedStaff, setSelectedStaff, isOpen, setIsOpen }) {
+  const location = useLocation();
+  const isSeparateRoute = location.pathname === '/separate';
+
   const [staffList, setStaffList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddStaff, setShowAddStaff] = useState(false);
@@ -50,7 +53,8 @@ export default function Sidebar({ selectedStaff, setSelectedStaff, isOpen, setIs
     
     const { error } = await supabase.from('staff').insert([{ 
       name: newStaffName, 
-      nationality: newStaffNationality 
+      nationality: newStaffNationality,
+      is_separate: isSeparateRoute
     }]);
 
     if (error) {
@@ -98,7 +102,7 @@ export default function Sidebar({ selectedStaff, setSelectedStaff, isOpen, setIs
       <div className="sidebar-header">
         <h1 className="logo">
           <LayoutDashboard className="logo-icon" size={24} />
-          Prodaddy
+          {isSeparateRoute ? 'Separate App' : 'Prodaddy'}
         </h1>
       </div>
 
@@ -123,93 +127,50 @@ export default function Sidebar({ selectedStaff, setSelectedStaff, isOpen, setIs
               onClick={() => { setSelectedStaff(null); setIsOpen(false); }}
             >
               <div className="staff-info">
-                <User size={18} className="flex-shrink-0" />
-                <span className="staff-name-text">All Records</span>
+                <User size={18} />
+                <span>All Records</span>
               </div>
             </li>
             
             {loading ? (
               <div style={{ padding: '1rem', color: 'var(--text-muted)' }}>Loading...</div>
             ) : (
-              staffList.map((staff) => {
-                const isDeepa = staff.name.toLowerCase() === 'deepa';
-
-                if (isDeepa) {
-                  const deepaRecords = records.filter(r => r.staff_id === staff.id);
-                  const todayStr = format(new Date(), 'yyyy-MM-dd');
-                  
-                  const companyCommission = deepaRecords.reduce((sum, r) => sum + Number(r.staff_commission), 0);
-                  const deepaNetEarnings = deepaRecords.reduce((sum, r) => sum + (Number(r.amount) - Number(r.staff_commission)), 0);
-                  
-                  const todayRecords = deepaRecords.filter(r => r.service_date === todayStr);
-                  const todayCommission = todayRecords.reduce((sum, r) => sum + Number(r.staff_commission), 0);
-                  const todayNetEarnings = todayRecords.reduce((sum, r) => sum + (Number(r.amount) - Number(r.staff_commission)), 0);
-
-                  return (
-                    <li 
-                      key={staff.id} 
-                      className={`staff-item deepa-card ${selectedStaff?.id === staff.id ? 'active' : ''}`}
-                      onClick={() => { setSelectedStaff(staff); setIsOpen(false); }}
-                    >
-                      <div className="staff-header">
-                        <div className="staff-info">
-                          <User size={18} className="flex-shrink-0 deepa-accent-text" />
-                          <span className="staff-name-text deepa-accent-text">{staff.name}</span>
-                        </div>
-                        <div className="staff-actions">
-                          <button onClick={(e) => handleEditStaffClick(e, staff)} className="staff-action-btn edit"><Edit size={14} /></button>
-                          <button onClick={(e) => handleDeleteStaff(e, staff.id)} className="staff-action-btn delete"><Trash size={14} /></button>
-                        </div>
-                      </div>
-
-                      <div className="deepa-stats">
-                        <div className="deepa-stat-row">
-                          <span className="deepa-label">Company Commission</span>
-                          <span className="deepa-value">AED {companyCommission.toFixed(2)}</span>
-                        </div>
-                        <div className="deepa-stat-row">
-                          <span className="deepa-label">Deepa Net Earnings</span>
-                          <span className="deepa-value highlight">AED {deepaNetEarnings.toFixed(2)}</span>
-                        </div>
-                        <div className="deepa-divider"></div>
-                        <div className="deepa-stat-row">
-                          <span className="deepa-label">Today Commission</span>
-                          <span className="deepa-value">AED {todayCommission.toFixed(2)}</span>
-                        </div>
-                        <div className="deepa-stat-row">
-                          <span className="deepa-label">Today Net Earnings</span>
-                          <span className="deepa-value highlight">AED {todayNetEarnings.toFixed(2)}</span>
-                        </div>
-                      </div>
-                    </li>
-                  );
-                }
-
-                return (
-                  <li 
-                    key={staff.id} 
-                    className={`staff-item ${selectedStaff?.id === staff.id ? 'active' : ''}`}
-                    onClick={() => { setSelectedStaff(staff); setIsOpen(false); }}
-                  >
-                    <div className="staff-info">
-                      <User size={18} className="flex-shrink-0" />
-                      <span className="staff-name-text">{staff.name}</span>
+              staffList.filter(s => isSeparateRoute ? s.is_separate : !s.is_separate).map((staff) => (
+                <li 
+                  key={staff.id} 
+                  className={`staff-item ${selectedStaff === staff.id ? 'active' : ''}`}
+                  onClick={() => { setSelectedStaff(staff.id); setIsOpen(false); }}
+                >
+                  <div className="staff-info">
+                    <User size={18} />
+                    <span>{staff.name}</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <div className="staff-earnings">
+                      AED {Number(staff.total_earnings).toFixed(2)}
                     </div>
-                    <div className="staff-stats-container">
-                      <div className="staff-earnings">
-                        AED {Number(staff.total_earnings).toFixed(2)}
-                      </div>
-                      <div className="staff-actions">
-                        <button onClick={(e) => handleEditStaffClick(e, staff)} className="staff-action-btn edit"><Edit size={14} /></button>
-                        <button onClick={(e) => handleDeleteStaff(e, staff.id)} className="staff-action-btn delete"><Trash size={14} /></button>
-                      </div>
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <button onClick={(e) => handleEditStaffClick(e, staff)} style={{ background: 'transparent', border: 'none', color: '#60a5fa', cursor: 'pointer' }}><Edit size={14} /></button>
+                      <button onClick={(e) => handleDeleteStaff(e, staff.id)} style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer' }}><Trash size={14} /></button>
                     </div>
-                  </li>
-                );
-              })
+                  </div>
+                </li>
+              ))
             )}
           </ul>
         </div>
+      </div>
+
+      <div className="sidebar-footer" style={{ padding: '1.5rem', borderTop: '1px solid var(--glass-border)', marginTop: 'auto' }}>
+        {isSeparateRoute ? (
+          <Link to="/" className="btn btn-outline" style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem' }}>
+            <LayoutDashboard size={16} /> Main Dashboard
+          </Link>
+        ) : (
+          <Link to="/separate" className="btn btn-outline" style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem' }}>
+            <ArrowRightCircle size={16} /> Separate Dashboard
+          </Link>
+        )}
       </div>
 
       {showAddStaff && (

@@ -80,3 +80,6 @@ create policy "Allow all operations for staff" on public.staff for all using (tr
 
 drop policy if exists "Allow all operations for records" on public.records;
 create policy "Allow all operations for records" on public.records for all using (true);
+
+-- Migration for Strict Separation
+alter table public.staff add column if not exists is_separate boolean default false;
